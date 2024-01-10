@@ -1,0 +1,95 @@
+
+<fuse-alert
+    class="mt-8"
+    *ngIf="showAlert"
+    [appearance]="'outline'"
+    [showIcon]="false"
+    [type]="alert.type"
+    [@shake]="alert.type === 'error'">
+    {{alert.message}}
+</fuse-alert>
+<form [formGroup]="securityForm" #securityNgForm="ngForm">
+    <!-- Section -->
+    <div class="w-full">
+        <div class="text-xl mt-3">Change your password</div>
+        <div class="text-secondary">
+            Regularly changing passwords is a recommended practice for maintaining the security
+        </div>
+    </div>
+    <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+        <!-- Current password -->
+        <div class="sm:col-span-4">
+            <mat-form-field
+                class="w-full"
+                [subscriptSizing]="'dynamic'">
+                <mat-label>Current password</mat-label>
+                <mat-icon
+                    class="icon-size-5"
+                    [svgIcon]="'heroicons_solid:key'"
+                    matPrefix></mat-icon>
+                <input
+                    [formControlName]="'currentPassword'"
+                    type="password"
+                    matInput>
+                    <mat-error>Current password is required</mat-error>
+                    <!-- <input matInput type="password" [(ngModel)]="currentPassword" name="currentPassword" required> -->
+            </mat-form-field>
+        </div>
+        <!-- New password -->
+        <div class="sm:col-span-4">
+            <mat-form-field
+                class="w-full"
+                [subscriptSizing]="'dynamic'">
+                <mat-label>New password</mat-label>
+                <mat-icon
+                    class="icon-size-5"
+                    [svgIcon]="'heroicons_solid:key'"
+                    matPrefix></mat-icon>
+                <input
+                    [formControlName]="'newPassword'"
+                    type="password" #passwordField
+                    matInput>
+                <button
+                    mat-icon-button
+                    type="button"
+                    (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                    matSuffix>
+                    <mat-icon
+                        class="icon-size-5"
+                        *ngIf="passwordField.type === 'password'"
+                        [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                    <mat-icon
+                        class="icon-size-5"
+                        *ngIf="passwordField.type === 'text'"
+                        [svgIcon]="'heroicons_solid:eye-off'"></mat-icon>
+                </button>
+                <mat-hint>
+                    Password: 6-16 chars, 1 letter, 1 digit, 1 special char.
+                </mat-hint>
+                <mat-error *ngIf="securityForm.get('newPassword').hasError('required')">
+                    New Password is required
+                </mat-error>
+                <mat-error *ngIf="securityForm.get('newPassword').hasError('pattern')">
+                    Invalid Password
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+    <!-- Divider -->
+    <div class="my-10 border-t"></div>
+    <!-- Actions -->
+    <div class="flex items-center justify-end">
+        <button
+            mat-stroked-button
+            type="reset">
+            Clear
+        </button>
+        <button
+            class="ml-4"
+            mat-flat-button
+            type="button"
+            [color]="'primary'" [disabled]="securityForm.disabled" (click)='changPassword()'>
+            <span *ngIf="!securityForm.disabled">Save</span>
+        </button>
+    </div>
+</form>

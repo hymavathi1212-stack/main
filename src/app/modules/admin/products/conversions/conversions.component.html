@@ -1,0 +1,285 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+
+        <div class="text-4xl font-extrabold tracking-tight">Product Conversions</div>
+        <!-- Actions -->
+        <div class="flex flex-col shrink-0 items-center sm:flex-row mt-6 sm:mt-0 sm:ml-4">
+
+            <mat-form-field
+                    class="w-full sm:w-72 mt-4 xl:mt-3 sm:mt-0 sm:ml-4"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-icon
+                        matPrefix
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                    <input
+                        (input)="filterByQuery(query.value)"
+                        placeholder="Search by name/email/mobile/affyCode"
+                        matInput
+                        #query>
+            </mat-form-field>
+
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+
+        <!-- Users list -->
+        <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+            <ng-container>
+                <ng-container *ngIf="conversionsList.length > 0; else noUsers">
+                    <div class="grid">
+                        <!-- Header -->
+                        <div
+                            class="grid-flow-col auto-cols-fr z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                            matSort
+                            (matSortChange)="sortData($event)"
+                            matSortDisableClear>
+                            <div class="hidden lg:block"
+                            [mat-sort-header]="'id'">
+                                ID
+                            </div>
+                            <div
+                            class="hidden lg:block"
+                            [mat-sort-header]="'name'">
+                            Name
+                        </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'email'">
+                                Email
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'mobile'">
+                                Mobile
+                            </div>
+
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'createdAt'">
+                                Affy Code
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'tempUserId'">
+                                Temp UserId
+                            </div>
+                            <div class="hidden lg:block" [mat-sort-header]="'joinedOn'">JoinedOn</div>
+
+                            <div class="hidden lg:block mx-auto">
+                                Details
+                            </div>
+                        </div>
+                        <!-- Rows -->
+                        <ng-container *ngIf="conversionsList?.length > 0">
+                            <ng-container *ngFor="let user of conversionsList; trackBy: trackByFn">
+                                <div class="grid grid-flow-col auto-cols-fr items-center py-3 px-6 md:px-8 border-b">
+
+                                    <div class="hidden text-sm sm:block truncate">
+                                        #{{user.id}}
+                                    </div>
+
+                                    <div class="hidden text-sm sm:block">
+                                        {{user.name}}
+                                    </div>
+                                    <div [cdkCopyToClipboard]="user.email" [matTooltip]="'Click to Copy Email'" class="hidden cursor-pointer text-xs sm:block truncate">
+                                        {{user.email}}
+                                    </div>
+                                    <div class="hidden text-sm font-mono sm:block">
+                                        {{user.mobile || '-'}}
+                                    </div>
+                                    <div class="hidden text-xs uppercase sm:block truncate">
+                                        {{user.affiliateCode}}
+                                    </div>
+                                    <div class="hidden text-xs sm:block truncate">
+                                        {{user.tempUserId}}
+                                    </div>
+                                    <div class="hidden text-xs sm:block truncate">
+                                        {{user.createdAt | date: 'MMM dd,yy hh:mm a'}}
+                                    </div>
+
+                                    <div class="mx-auto">
+
+                                        <button
+                                            class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                            mat-stroked-button
+                                            (click)="toggleDetails(user.id)">
+
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [svgIcon]="selectedUser?.id === user.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+
+                                            </button>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="grid">
+                                    <ng-container *ngIf="selectedUser?.id === user.id">
+                                        <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: user}"></ng-container>
+                                    </ng-container>
+
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+
+                    <mat-paginator
+                        class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                        [ngClass]="{'pointer-events-none': isLoading}"
+                        [length]="pagination.length"
+                        [pageIndex]="pagination.page"
+                        [pageSize]="pagination.size"
+                        [pageSizeOptions]="[10, 20, 50]"
+                        (page)="handlePageChange($event)"
+                        [showFirstLastButtons]="true"></mat-paginator>
+
+                </ng-container>
+            </ng-container>
+
+            <ng-template
+                #rowDetailsTemplate
+                let-product>
+                <div class="shadow-lg overflow-hidden">
+                    <div class="flex border-b">
+                        <div class="grid grid-flow-col auto-cols-fr gap-4 w-full mb-4 px-6 py-4">
+                            <div class="flex flex-col border-r">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:shopping-cart" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Product Details</h6>
+                                </div>
+                                <div class="flex flex-row">
+                                    <div class="flex-col">
+                                        <div class="flex felx-row">
+                                            <div class="img-width-height-2-1 border rounded overflow-hidden mr-2">
+                                                <img class="w-full h-full object-cover" [src]="selectedUser?.productId?.image" onerror="this.src='assets/images/backgrounds/image_not_available.png';">
+                                            </div>
+                                            <div class="flex items-start flex-col mr-3">
+                                                <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Title</h6>
+                                                <div class="leading-6">
+                                                    <span class="text-sm">{{selectedUser?.productId?.productTitle}}</span>
+                                                </div>
+                                                <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Url</h6>
+                                                <div class="leading-6">
+                                                    <span class="text-sm">
+                                                        <a class="underline text-blue-500" [href]="selectedUser?.productId?.productUrl" target="_blank">
+                                                            {{selectedUser?.productId?.productUrl}}
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start flex-col mt-2 mr-3">
+                                            <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Description</h6>
+                                            <div class="leading-6">
+                                                <span class="text-sm break-words">{{selectedUser?.productId?.productDescription}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex items-center justify-start mb-2">
+                                    <mat-icon svgIcon="feather:user-check" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Conversion Details</h6>
+                                </div>
+                                <div class="flex-row grid grid-cols-3">
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Affiliate Status</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedUser?.affiliateStatus}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Payment Status</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedUser?.paymentStatus}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Last updatedAt</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedUser?.updatedAt | date: 'dd MMM yyyy, HH:mm'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-start mb-2 mt-3">
+                                    <mat-icon svgIcon="feather:user-check" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Affiliate Details</h6>
+                                </div>
+                                <div class="flex-row grid grid-cols-3">
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Name</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{conversionDetails?.name || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Mobile</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{conversionDetails?.mobile || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Email</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{conversionDetails?.email || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Price</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(conversionDetails?.productFinalPrice | currency: 'INR') || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Commission (%)</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(conversionDetails?.finalCommissionPercentage) ? (conversionDetails?.finalCommissionPercentage + '%') : 'N.A' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Commission Amt</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(conversionDetails?.finalCommissionAmount | currency: 'INR') || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Payment Ref</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(conversionDetails?.paymentReference) || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Comments</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{conversionDetails?.comments || 'N.A' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Last UpdatedAt</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(conversionDetails?.acpUpdatedAt | date: 'dd MMM yy hh:mm') || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #noUsers>
+                <div *ngIf="!isLoading" class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no users!</div>
+            </ng-template>
+
+        </div>
+
+    </div>
+
+</div>

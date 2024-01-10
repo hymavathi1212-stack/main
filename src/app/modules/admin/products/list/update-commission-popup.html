@@ -1,0 +1,56 @@
+<div class="flex flex-0 rounded items-center justify-between h-12 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-gray-600 text-on-primary">
+    <div class="text-lg font-medium">
+        ProfileType Wise Commission - #{{data?.selectedProduct?.id}}-{{data?.selectedProduct?.productTitle}}
+    </div>
+    <button
+        mat-icon-button
+        mat-dialog-close
+        [tabIndex]="-1">
+        <mat-icon
+            class="text-current"
+            [svgIcon]="'heroicons_outline:x'"></mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="mat-typography" #dialogContent>
+    <p class="mb-5 text-center text-red-600 italic">Note: Change(s) will be notified to the user(s) via email</p>
+    <form #commissionNgForm="ngForm">
+        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-2">
+            <mat-form-field *ngFor="let item of profileTypes" class="flex-auto">
+                <mat-label>{{item?.profileType}}</mat-label>
+                <input
+                    matInput
+                    [(ngModel)]="profileTypeModel[item?.id]"
+                    [ngModelOptions]="{standalone: true}"
+                    [placeholder]="item?.profileType"
+                    min="0"
+                    max="100"
+                    type="number"
+                    required>
+                <span matSuffix>%</span>
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:currency-rupee'"></mat-icon>
+            </mat-form-field>
+        </div>
+        <div class="flex justify-end">
+            <button
+                class="px-8 mr-2"
+                mat-flat-button
+                [color]="'accent'"
+                mat-dialog-close
+                type="button">
+                Close
+            </button>
+            <button [disabled]="reqProcessing" class="px-8" type="submit" mat-flat-button [color]="'primary'"(click)="saveCommission()">
+                <span *ngIf="!reqProcessing">
+                    Save Commission
+                </span>
+                <mat-progress-spinner
+                    *ngIf="reqProcessing"
+                    [diameter]="24"
+                    [mode]="'indeterminate'"></mat-progress-spinner>
+            </button>
+        </div>
+    </form>
+</mat-dialog-content>

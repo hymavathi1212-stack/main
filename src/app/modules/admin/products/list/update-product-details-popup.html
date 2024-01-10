@@ -1,0 +1,185 @@
+<div class="flex flex-0 rounded items-center justify-between h-12 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-gray-600 text-on-primary">
+    <div class="text-lg font-medium">
+        Update Product Details
+    </div>
+    <button
+        mat-icon-button
+        mat-dialog-close
+        [tabIndex]="-1">
+        <mat-icon
+            class="text-current"
+            [svgIcon]="'heroicons_outline:x'"></mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="mat-typography" #dialogContent>
+    <form [formGroup]="createProductForm" #updateNgForm="ngForm">
+        <div class="grid sm:grid-cols-1 gap-y-0	gap-1 md:grid-cols-1">
+            <mat-form-field class="flex-auto">
+                    <input
+                        matInput
+                        [formControlName]="'productTitle'"
+                        [placeholder]="'Product Title'"
+                        type="text"
+                        minlength="5"
+                        maxlength="200"
+                        required>
+                    <mat-icon
+                        class="icon-size-5"
+                        matPrefix
+                        [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
+                    <mat-error *ngIf="createProductForm?.get('productTitle').hasError('required')">
+                        Please enter Product Title
+                    </mat-error>
+                    <mat-error *ngIf="createProductForm?.get('productTitle').hasError('pattern')">
+                        Invalid Product Title
+                    </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="flex-auto">
+                    <textarea
+                        matInput
+                        [formControlName]="'productDescription'"
+                        [placeholder]="'Product Description'"
+                        [rows]="3"
+                        minlength="5"
+                        maxlength="1000"></textarea>
+                    <mat-icon
+                        class="icon-size-5"
+                        matPrefix
+                        [svgIcon]="'heroicons_solid:menu-alt-2'"></mat-icon>
+                <mat-error *ngIf="createProductForm?.get('productDescription').hasError('required')">
+                    Product Description is required
+                </mat-error>
+                <mat-error *ngIf="createProductForm?.get('productDescription').hasError('minlength')">
+                    Invalid Product Description Details
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-2">
+            <mat-form-field class="flex-auto">
+                <input
+                    matInput
+                    [formControlName]="'image'"
+                    [placeholder]="'Image Url'"
+                    minlength="1"
+                    maxlength="200"
+                    type="text">
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:globe-alt'"></mat-icon>
+                <mat-error *ngIf="createProductForm?.get('image').hasError('required')">
+                    Image Url is required
+                </mat-error>
+                <mat-error *ngIf="createProductForm?.get('image').hasError('pattern')">
+                    Invalid Image Url
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="flex-auto">
+                <input
+                    matInput
+                    [formControlName]="'productUrl'"
+                    [placeholder]="'Product Url'"
+                    minlength="1"
+                    maxlength="200"
+                    type="text"
+                    required>
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:globe-alt'"></mat-icon>
+                <mat-error *ngIf="createProductForm?.get('productUrl').hasError('required')">
+                    Product Url is required
+                </mat-error>
+                <mat-error *ngIf="createProductForm?.get('productUrl').hasError('pattern')">
+                    Invalid Product Url
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-3">
+            <mat-form-field class="flex-auto">
+                <input
+                    matInput
+                    [formControlName]="'price'"
+                    [placeholder]="'Actual Price'"
+                    minlength="1"
+                    maxlength="10"
+                    type="text"
+                    required>
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:currency-rupee'"></mat-icon>
+                <mat-error *ngIf="createProductForm?.get('price').hasError('required')">
+                    Actual Price is required
+                </mat-error>
+                <mat-error *ngIf="createProductForm?.get('price').hasError('minlength')">
+                    Invalid Product price
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="flex-auto">
+                <input
+                    matInput
+                    [formControlName]="'offerPrice'"
+                    [placeholder]="'Offer Price'"
+                    minlength="1"
+                    maxlength="10"
+                    type="text">
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:currency-rupee'"></mat-icon>
+                <mat-error *ngIf="createProductForm?.get('offerPrice').hasError('required')">
+                    Offer Price is required
+                </mat-error>
+                <mat-error *ngIf="createProductForm?.get('offerPrice').hasError('pattern')">
+                    Invalid Offer Price
+                </mat-error>
+                <mat-error *ngIf="createProductForm?.get('offerPrice').hasError('offerPriceExceeded')">
+                    Offer price can not be equal or more than actual price
+                </mat-error>
+                <mat-error *ngIf="createProductForm?.get('offerPrice').hasError('priceValueRequired')">
+                    Please Enter Actual Price
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="flex-auto">
+                <input
+                    matInput
+                    [min]="minDate"
+                    [matDatepicker]="expiryDatepicker"
+                    [formControlName]="'expiryDate'"
+                    [placeholder]="'Expiry date'">
+                <mat-datepicker-toggle
+                    matSuffix
+                    [for]="expiryDatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #expiryDatepicker></mat-datepicker>
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:shield-exclamation'"></mat-icon>
+                <mat-error *ngIf="createProductForm?.get('expiryDate').hasError('required')">
+                    Expiry Date Required
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="flex justify-end mt-5">
+            <button
+                class="px-8 mr-2"
+                mat-flat-button
+                mat-dialog-close
+                [color]="'accent'"
+                type="button">
+                Close
+            </button>
+            <button
+                    class="px-8"
+                    type="submit"
+                    mat-flat-button
+                    [disabled]="!createProductForm.dirty || createProductForm.invalid || reqProcessing"
+                    [color]="'primary'"(click)="updateDetails()">
+                    Update Product
+            </button>
+        </div>
+    </form>
+</mat-dialog-content>

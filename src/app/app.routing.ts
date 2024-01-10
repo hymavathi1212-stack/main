@@ -1,0 +1,183 @@
+import { Route } from '@angular/router';
+import { AuthGuard } from 'app/core/auth/guards/auth.guard';
+import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
+import { LayoutComponent } from 'app/layout/layout.component';
+import { InitialDataResolver } from 'app/app.resolvers';
+import { AdminGuard } from './core/auth/guards/admin.guard';
+import { AffliaterGuard } from './core/auth/guards/affliater.guard';
+import { VerifiedAffliaterGuard } from './core/auth/guards/verifiedAffiliater.guard';
+import { StudentGuard } from './core/auth/guards/student.guard';
+
+// @formatter:off
+/* eslint-disable max-len */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+export const appRoutes: Route[] = [
+
+    // Redirect empty path to '/dashboard'
+    {path: '', pathMatch : 'full', redirectTo: 'dashboard'},
+
+    // Redirect signed-in user to the '/dashboard'
+    //
+    // After the user signs in, the sign-in page will redirect the user to the 'signed-in-redirect'
+    // path. Below is another redirection for that path to redirect the user to the desired
+    // location. This is a small convenience to keep all main routes together here on this file.
+    {path: 'signed-in-redirect', pathMatch : 'full', redirectTo: 'dashboard'},
+
+    // Auth routes for guests
+    {
+        path: '',
+        canMatch: [NoAuthGuard],
+        component: LayoutComponent,
+        data: {
+            layout: 'empty'
+        },
+        children: [
+            {path: 'verify-account', loadChildren: () => import('app/modules/auth/verify-account/verify-account.module').then(m => m.VerifyAccountModule)},
+            {path: 'confirmation-required', loadChildren: () => import('app/modules/auth/confirmation-required/confirmation-required.module').then(m => m.AuthConfirmationRequiredModule)},
+            {path: 'forgot-password', loadChildren: () => import('app/modules/auth/forgot-password/forgot-password.module').then(m => m.AuthForgotPasswordModule)},
+            {path: 'reset-password', loadChildren: () => import('app/modules/auth/reset-password/reset-password.module').then(m => m.AuthResetPasswordModule)},
+            {path: 'sign-in', loadChildren: () => import('app/modules/auth/sign-in/sign-in.module').then(m => m.AuthSignInModule)},
+            {path: 'sign-up', loadChildren: () => import('app/modules/auth/sign-up/sign-up.module').then(m => m.AuthSignUpModule)},
+            {path:'studentsign-up',loadChildren:() => import('app/modules/auth/studentsign-up/studentsign-up.module').then(m => m.AuthStudentsignUpModule)},
+            {path: 'studentconfirmation-required', loadChildren: () => import('app/modules/auth/studentconfirmation-required/studentconfirmation-required.module').then(m => m.AuthStudentconfirmationRequiredModule)},
+        //      {path:'studentsign-in',loadChildren:() => import('app/modules/auth/studentsign-in/studentsign-in.module').then(m => m.AuthStudentsignInModule)}
+         ]
+    },
+
+    // Auth routes for authenticated users
+    {
+        path: '',
+        canMatch: [AuthGuard],
+        component: LayoutComponent,
+        data: {
+            layout: 'empty'
+        },
+        children: [
+            {path: 'sign-out', loadChildren: () => import('app/modules/auth/sign-out/sign-out.module').then(m => m.AuthSignOutModule)},
+            {path: 'unlock-session', loadChildren: () => import('app/modules/auth/unlock-session/unlock-session.module').then(m => m.AuthUnlockSessionModule)}
+        ]
+    },
+
+    // Landing routes
+    {
+        path: '',
+        component: LayoutComponent,
+        data: {
+            layout: 'empty'
+        },
+        children: [
+            {path: 'home', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule)},
+        ]
+    },
+
+    // Common routes
+    {
+        path: '',
+        canMatch: [AuthGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        children: [
+            {
+                path: 'dashboard', loadChildren: () => import('app/modules/common/dashboard/dashboard.module').then(m => m.DashboardModule)
+            },
+            {
+                path: 'settings', loadChildren: () => import('app/modules/common/settings/settings.module').then(m => m.SettingsModule)
+            },
+        ]
+    },
+
+    // Affliater routes
+    {
+        path: 'affliater',
+        canMatch: [AffliaterGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        children: [
+            {
+                path: 'dashboard', loadChildren: () => import('app/modules/common/dashboard/dashboard.module').then(m => m.DashboardModule)
+            },
+            {
+                path: 'analytics', canMatch: [VerifiedAffliaterGuard], loadChildren: () => import('app/modules/common/analytics/analytics.module').then(m => m.AnalyticsModule)
+            },
+            {
+                path: 'transactions', canMatch: [VerifiedAffliaterGuard], loadChildren: () => import('app/modules/affliater/transactions/transactions.module').then(m => m.TransactionsModule)
+            },
+            {
+                path: 'profile', loadChildren: () => import('app/modules/affliater/affliate-profile/affliate-profile.module').then(m => m.AffliateProfileModule)
+            }
+        ]
+    },
+
+    // Admin routes
+    {
+        path: 'admin',
+        canMatch: [AdminGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        children: [
+            {
+                path: 'dashboard', loadChildren: () => import('app/modules/common/dashboard/dashboard.module').then(m => m.DashboardModule)
+            },
+            {
+                path: 'users', loadChildren: () => import('app/modules/admin/users/users.module').then(m => m.UsersModule)
+            },
+            {
+                path: 'products', loadChildren: () => import('app/modules/admin/products/products.module').then(m => m.ProductsModule)
+            },
+            {
+                path: 'payments', loadChildren: () => import('app/modules/admin/payments/payments.module').then(m => m.PaymentsModule)
+            }
+        ]
+    },
+
+    // Student routes
+    {
+        path: 'student',
+        canMatch: [StudentGuard],
+        component: LayoutComponent,
+        resolve: {
+            initialData: InitialDataResolver,
+        },
+        children: [
+            {
+                path: 'dashboard', loadChildren: () => import('app/modules/common/dashboard/dashboard.module').then(m => m.DashboardModule)
+            },
+            {
+                path: 'learningcalendar', loadChildren: () => import('app/modules/student/learningcalendar/learningcalendar.module').then(m => m.LearningcalendarModule)
+            },
+            // these are admin routes
+            // {
+            //     path: 'users', loadChildren: () => import('app/modules/admin/users/users.module').then(m => m.UsersModule)
+            // },
+            // {
+            //     path: 'products', loadChildren: () => import('app/modules/admin/products/products.module').then(m => m.ProductsModule)
+            // },
+            // {
+            //     path: 'payments', loadChildren: () => import('app/modules/admin/payments/payments.module').then(m => m.PaymentsModule)
+            // }
+        ]
+    },
+
+
+    //not-found
+    {
+        path: '',
+        component: LayoutComponent,
+        data: {
+            layout: 'empty'
+        },
+        children: [
+            {
+                path: 'page-not-found', loadChildren: () => import('app/modules/landing/page-not-found/page-not-found.module').then(m => m.PageNotFoundModule)
+            }
+        ]
+    },
+
+    { path: '**', redirectTo: '/page-not-found' }
+];

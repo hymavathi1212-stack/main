@@ -1,0 +1,50 @@
+<div class="py-3">
+    <div class="bg-gray-500 rounded items-end flex justify-between mb-4">
+        <h1 class="text-left text-white text-lg font-medium px-4 mb-2">
+            #{{data?.product?.id}}-{{data?.product?.productTitle}}
+        </h1>
+        <button (click)="closeSheet()" mat-icon-button aria-label="close">
+            <mat-icon class="text-white" svgIcon="feather:x-circle"></mat-icon>
+        </button>
+    </div>
+    <h1 class="text-center text-lg font-bold text-green-600 px-4 mb-3">
+        "Share and Earn: Promote Your Affiliate Link on Social Media!"
+    </h1>
+    <mat-form-field class="flex-auto w-full">
+        <textarea [(ngModel)]="messageContent" matInput required matTextareaAutosize rows="3" matAutosizeMinRows=10 matAutosizeMaxRows=15></textarea>
+        <mat-hint align="end" class="text-xs">*You can customize message however you want to promote</mat-hint>
+    </mat-form-field>
+    <div class="grid items-center justify-items-center mt-2">
+        <div class="bg-slate-100 max-w-md mx-4 px-5 py-3 mb-5 rounded">
+            <p class="text-center">
+                {{messageContent}}
+            </p>
+            <div class="border-t my-1"></div>
+            <div class="text-center">
+                <a [href]="data?.product?.short_url" target="_blank" class="text-center underline text-blue-500">
+                    {{data?.product?.short_url}}
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="social-icons grid md:grid-cols-6 sm:grid-cols-3 gap-2 justify-items-center items-center">
+        <button (click)="share('FB')" class="fb" [matTooltip]="'Share On Facebook'" mat-fab aria-label="Facebook">
+            <mat-icon svgIcon="feather:facebook"></mat-icon>
+        </button>
+        <button (click)="share('LINKEDIN')" class="linkedin" [matTooltip]="'Share On LinkedIn'" mat-fab aria-label="LinkedIn">
+            <mat-icon svgIcon="feather:linkedin"></mat-icon>
+        </button>
+        <button (click)="share('TWITTER')" class="twitter" [matTooltip]="'Share On Twitter'" mat-fab aria-label="Twitter">
+            <mat-icon svgIcon="feather:twitter"></mat-icon>
+        </button>
+        <button (click)="share('WHATSAPP')" class="whatsapp" [matTooltip]="'Share On Whatsapp'" mat-fab aria-label="Whatsapp">
+            <mat-icon svgIcon="feather:message-circle"></mat-icon>
+        </button>
+        <button (click)="share('COPY')" class="copy" [matTooltip]="'Copy Link'" mat-fab aria-label="Copy">
+            <mat-icon svgIcon="feather:copy"></mat-icon>
+        </button>
+        <button (click)="share('COPY-LINK')" color="primary" class="copy" [matTooltip]="'Copy Only Link'" mat-fab aria-label="link">
+            <mat-icon svgIcon="feather:link"></mat-icon>
+        </button>
+    </div>
+</div>

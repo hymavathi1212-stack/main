@@ -1,0 +1,179 @@
+
+<div class="flex flex-0 rounded items-center justify-between h-12 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-gray-600 text-on-primary">
+    <div class="text-lg font-medium">
+        User Wise Commission - #{{data?.selectedProduct?.id}}-{{data?.selectedProduct?.productTitle}}
+    </div>
+    <button
+        mat-icon-button
+        mat-dialog-close
+        [tabIndex]="-1">
+        <mat-icon
+            class="text-current"
+            [svgIcon]="'heroicons_outline:x'"></mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="mat-typography" #dialogContent>
+    <p class="mb-5 text-center text-red-600 italic">Note: Change(s) will be notified to the user(s) via email</p>
+    <div class="grid items-center text-center grid-flow-col auto-cols-fr mb-3">
+        <div [ngClass]="commissionItem?.profileTypeId?.id === selectedUser?.profileTypeId ? 'bg-green-200' : ''" *ngFor="let commissionItem of data?.selectedProduct?.commissionDetails" class="flex items-start flex-col border-r">
+            <h6 class="font-semibold text-gray-400 leading-6 text-md mx-3">
+                {{commissionItem?.profileTypeId?.profileType}}<small *ngIf="commissionItem?.profileTypeId?.id === selectedUser?.profileTypeId">- (Current User Profile Type)</small>
+            </h6>
+            <div class="leading-6 mx-3">
+                <span class="text-sm font-semibold">{{commissionItem?.commissionRate}} %</span>
+            </div>
+        </div>
+    </div>
+    <div class="w-full bg-slate-100 px-5 py-5 rounded">
+        <form class="w-full">
+            <mat-form-field class="w-full fuse-mat-dense fuse-mat-emphasized-affix">
+              <mat-label>Choose User From List</mat-label>
+              <input matInput
+                     aria-label="user"
+                     [matAutocomplete]="auto"
+                     placeholder="Search By Name/Email"
+                     [formControl]="userSearchCtrl">
+              <mat-icon matPrefix class="icon-size-5" [svgIcon]="'heroicons_solid:search'"></mat-icon>
+              <mat-autocomplete (optionSelected)="onOptionSelected($event)" #auto="matAutocomplete">
+                <mat-option *ngFor="let user of searchResults" [value]="user.email">
+                  <span>#{{user.id}}-{{user.name}}</span> |
+                  <small>Email: {{user.email}}</small>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+        </form>
+        <ng-container *ngIf="selectedUser">
+            <form [formGroup]="commissionForm" #commissionNgForm="ngForm">
+                <div class="grid sm:grid-cols-2 gap-y-0	gap-4 md:grid-cols-4">
+                    <mat-form-field class="flex-auto">
+                        <input [formControlName]="'name'" matInput disabled [placeholder]="'Name'"
+                            required>
+                        <mat-icon
+                            class="icon-size-5"
+                            matPrefix
+                            [svgIcon]="'heroicons_solid:users'"></mat-icon>
+                    </mat-form-field>
+                    <mat-form-field class="flex-auto">
+                        <input [formControlName]="'email'" matInput disabled [placeholder]="'Email'"
+                            required>
+                        <mat-icon
+                            class="icon-size-5"
+                            matPrefix
+                            [svgIcon]="'heroicons_solid:mail'"></mat-icon>
+                    </mat-form-field>
+                    <mat-form-field class="flex-auto">
+                        <input [formControlName]="'commission'" matInput [placeholder]="'Commission'"
+                            required>
+                        <span matSuffix>%</span>
+                        <mat-icon
+                            class="icon-size-5"
+                            matPrefix
+                            [svgIcon]="'heroicons_solid:book-open'"></mat-icon>
+                        <mat-error *ngIf="commissionForm?.get('commission').hasError('required')">
+                            Commission Required
+                        </mat-error>
+                        <mat-error *ngIf="commissionForm?.get('commission').hasError('min')">
+                            Commission must be > 1
+                        </mat-error>
+                        <mat-error *ngIf="commissionForm?.get('commission').hasError('max')">
+                            Commission must be < 100
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="flex-auto">
+                        <input
+                            matInput
+                            [formControlName]="'endDate'"
+                            [matDatepicker]="expiryDatepicker"
+                            [placeholder]="'Expiry Date'"
+                            [min]="minDate">
+                        <mat-datepicker-toggle
+                            matSuffix
+                            [for]="expiryDatepicker">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #expiryDatepicker></mat-datepicker>
+                        <mat-icon
+                            class="icon-size-5"
+                            matPrefix
+                            [svgIcon]="'heroicons_solid:calendar-days'"></mat-icon>
+                        <mat-error>
+                            Invalid EndDate
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="flex justify-end">
+                    <button
+                        class="px-8 mr-2"
+                        mat-flat-button
+                        [color]="'accent'"
+                        (click)="resetForm()"
+                        type="button">
+                        Cancel
+                    </button>
+                    <button
+                        class="px-8"
+                        (click)="saveDetails()"
+                        [disabled]="commissionForm.invalid || commissionForm.disabled"
+                        mat-flat-button
+                        [color]="'primary'"
+                        type="button">
+                        <span *ngIf="!commissionForm.disabled">
+                            Save
+                        </span>
+                        <mat-progress-spinner
+                            *ngIf="commissionForm.disabled"
+                            [diameter]="24"
+                            [mode]="'indeterminate'"></mat-progress-spinner>
+                    </button>
+                </div>
+            </form>
+        </ng-container>
+    </div>
+    <div class="grid flex-row grid-cols-1 gap-5">
+        <div class="grid">
+            <div class="grid-flow-col items-center text-center auto-cols-fr grid gap-4 py-3 mt-4 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5">
+                <div>
+                    Name
+                </div>
+                <div>
+                    Email
+                </div>
+                <div>
+                    Commission
+                </div>
+                <div>
+                    End Date
+                </div>
+                <div>
+                    Action
+                </div>
+            </div>
+            <div *ngFor="let user of productCommissionUsersList" class="grid items-center text-center grid-flow-col auto-cols-fr border-b">
+                <div>
+                    <p class="text-sm">{{user?.name}}</p>
+                </div>
+                <div>
+                    <p class="text-sm">{{user?.email}}</p>
+                </div>
+                <div>
+                    <p class="font-mono text-sm">{{user?.commissionRate}} %</p>
+                </div>
+                <div>
+                    <p class="text-sm">{{user?.endDate | date: 'dd MMM yyyy, hh:mm'}}</p>
+                </div>
+                <div>
+                    <button (click)="removeCommission(user)" mat-icon-button>
+                        <mat-icon
+                            class="text-current"
+                            [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                    </button>
+                    <button (click)="editDetails(user)" mat-icon-button>
+                        <mat-icon
+                            class="text-current"
+                            [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</mat-dialog-content>

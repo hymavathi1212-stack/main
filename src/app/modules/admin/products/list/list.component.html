@@ -1,0 +1,256 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">Products</div>
+        <!-- Actions -->
+        <div class="flex flex-col shrink-0 items-center sm:flex-row mt-6 sm:mt-0 sm:ml-4">
+            <!-- <mat-form-field
+                    class="w-full sm:w-36"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-select
+                        [value]="selectedStatus"
+                        (selectionChange)="filterByCategory($event)">
+                        <mat-option [value]="''">All</mat-option>
+                        <mat-option [value]="'1'">Active</mat-option>
+                        <mat-option [value]="'0'">In-Active</mat-option>
+                        <mat-option [value]="'2'">Blocked</mat-option>
+                    </mat-select>
+            </mat-form-field> -->
+            <mat-form-field
+                    class="w-full sm:w-72 mt-4 xl:mt-3 sm:mt-0 sm:ml-4"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-icon
+                        matPrefix
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                    <input
+                        (input)="filterByQuery(query.value)"
+                        placeholder="Search by Product Name"
+                        matInput
+                        #query>
+            </mat-form-field>
+            <!-- Add button -->
+            <button
+                class="ml-4"
+                [routerLink]="'/admin/products/create'"
+                mat-flat-button
+                [color]="'primary'">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1">Add</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+        <!-- Products list -->
+        <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+            <ng-container>
+                <ng-container *ngIf="productsList.length > 0; else noProducts">
+                    <div class="grid">
+                        <!-- Header -->
+                        <div
+                            class="grid-flow-col auto-cols-fr z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                            matSort
+                            (matSortChange)="sortData($event)"
+                            matSortDisableClear>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'productTitle'">
+                                Product Title
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'price'">
+                                Price
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'productUrl'">
+                                Product Url
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'expiryDate'">
+                                Expiry Date
+                            </div>
+                            
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'statusId'">
+                                Status
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'updatedAt'">
+                                Last UpdatedAt
+                            </div>
+                            <div class="hidden lg:block mx-auto">
+                                Details
+                            </div>
+                        </div>
+                        <!-- Rows -->
+                        <ng-container *ngIf="productsList?.length > 0">
+                            <ng-container *ngFor="let products of productsList; trackBy: trackByFn">
+                                <div class="grid grid-flow-col auto-cols-fr items-center py-3 px-6 md:px-8 border-b">
+
+                                    <div class="hidden text-sm sm:block truncate mr-2">
+                                        #{{products.id}}-{{products.productTitle}}
+                                    </div>
+
+                                    <div class="flex flex-row gap-3">
+                                        <div [matTooltip]="'Commission Not Fully Configured For all ProfileTypes'" *ngIf="profileTypes?.length !== products?.commissionDetails?.length" class="flex items-end ml-2 w-1 bg-red-200 rounded overflow-hidden">
+                                            <div class="flex w-full h-2/3 bg-red-600"></div>
+                                        </div>
+                                        <div *ngIf="profileTypes?.length === products?.commissionDetails?.length" class="flex items-end ml-2 w-1 bg-green-100 rounded overflow-hidden">
+                                            <div class="flex w-full h-full bg-green-400"></div>
+                                        </div>
+                                        <div class="text-sm font-mono sm:block bg-gray-200 rounded px-2 py-1">
+                                            <ng-container *ngIf="products.offerPrice">
+                                                <span *ngIf="products.offerPrice">{{products.offerPrice | currency:'INR':'symbol':'1.2-4'}}</span>
+                                                (<strike>{{products.price | currency:'INR':'symbol':'1.2-4'}}</strike>)
+                                            </ng-container>
+                                            <ng-container *ngIf="!products.offerPrice">
+                                                <span>{{products.price | currency:'INR':'symbol':'1.2-4'}}</span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                    <div class="hidden text-sm sm:block text-center">
+                                        <a [href]="products.productUrl" target="_blank" class="text-blue-500 underline">
+                                            <mat-icon class="icon-size-4" svgIcon="feather:external-link"></mat-icon>
+                                            <span class="relative bottom-1 left-1">Link</span>
+                                        </a>
+                                    </div>
+
+                                    <div class="sm:block text-sm text-center">
+                                        {{(products.expiryDate | date: 'MMM dd,yy hh:mm a') || '-'}}
+                                    </div>
+
+                                    <div class="hidden text-sm sm:block text-center">
+                                        <span class="text-yellow-600" *ngIf="products?.statusId === 0">In-Active</span>
+                                        <span class="text-green-600" *ngIf="products?.statusId === 1">Active</span>
+                                    </div>
+
+                                    <div class="sm:block text-sm text-center">
+                                        {{(products.updatedAt | date: 'MMM dd,yy hh:mm a') || '-'}}
+                                    </div>
+
+                                    <!-- <div class="hidden text-sm font-mono sm:block">
+                                        {{products.productUrl}}
+                                    </div> -->
+
+                                    <div class="mx-auto">
+                                        <button
+                                            class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                            mat-stroked-button
+                                            (click)="toggleDetails(products.id)">
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [svgIcon]="selectedProduct?.id === products.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="grid">
+                                    <ng-container *ngIf="selectedProduct?.id === products.id">
+                                        <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: products}"></ng-container>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                    <mat-paginator
+                        class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                        [ngClass]="{'pointer-events-none': isLoading}"
+                        [length]="pagination.length"
+                        [pageIndex]="pagination.page"
+                        [pageSize]="pagination.size"
+                        [pageSizeOptions]="[3, 10, 20, 50]"
+                        (page)="handlePageChange($event)"
+                        [showFirstLastButtons]="true"></mat-paginator>
+                </ng-container>
+            </ng-container>
+
+            <ng-template
+                #rowDetailsTemplate
+                let-product>
+                <div class="shadow-lg overflow-hidden">
+                    <div class="flex border-b">
+                        <div class="grid grid-flow-col auto-cols-fr gap-4 w-full mb-4 px-6 py-4">
+                            <div class="flex flex-col border-r">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:shopping-cart" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Product Details</h6>
+                                </div>
+                                <div class="flex flex-row">
+                                    <div class="flex-col">
+                                        <div class="flex felx-row">
+                                            <div class="img-width-height-2-1 border rounded overflow-hidden mr-2">
+                                                <img class="w-full h-full object-cover" [src]="selectedProduct?.image" onerror="this.src='assets/images/backgrounds/image_not_available.png';">
+                                            </div>
+                                            <div class="flex items-start flex-col mr-3">
+                                                <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Title</h6>
+                                                <div class="leading-6">
+                                                    <span class="text-sm">{{selectedProduct?.productTitle}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start flex-col mt-2 mr-3">
+                                            <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Description</h6>
+                                            <div class="leading-6">
+                                                <span class="text-sm">{{selectedProduct?.productDescription}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:user-check" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Product Commission</h6>
+                                </div>
+                                <div class="flex-row grid grid-cols-3">
+                                    <div *ngFor="let commissionItem of selectedProduct?.commissionDetails" class="flex items-start flex-col border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md mx-3">{{commissionItem?.profileTypeId?.profileType}}</h6>
+                                        <div class="leading-6 mx-3">
+                                            <span class="text-sm font-semibold">{{commissionItem?.commissionRate}} %</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex-row grid grid-cols-1 mt-3">
+                                    
+                                    <div class="align-items-center justify-center flex">
+                                        <button (click)="openProfileTypeCommissionPopup()" class="fuse-mat-button-small mx-2 my-2 w-full" mat-stroked-button [color]="'primary'">
+                                            <mat-icon class="icon-size-5" svgIcon="heroicons_outline:currency-rupee"></mat-icon>
+                                            <span class="mx-2">Update Commission</span>
+                                        </button>
+                                        <button (click)="openDialog()" class="fuse-mat-button-small mx-2 my-2 w-full" mat-flat-button [color]="'primary'">
+                                            <mat-icon class="icon-size-5" svgIcon="heroicons_outline:currency-rupee"></mat-icon>
+                                            <span class="mx-2">User Wise Commission</span>
+                                        </button>
+                                    </div>
+                                    <div class="align-items-center justify-center flex">
+                                        <button (click)="toggleStatus(selectedProduct?.statusId)" class="fuse-mat-button mx-2 my-2 w-full" mat-stroked-button [color]="'secondary'">
+                                            <mat-icon class="icon-size-5" [svgIcon]="selectedProduct?.statusId === 0 ? 'feather:eye' : 'feather:eye-off'"></mat-icon>
+                                            <span class="mx-2">Mark as {{selectedProduct?.statusId === 1 ? 'In-Active' : 'Active'}}</span>
+                                        </button>
+                                        <button (click)="editProductDetails()" class="fuse-mat-button mx-2 my-2 w-full" mat-flat-button [color]="'accent'">
+                                            <mat-icon class="icon-size-5" svgIcon="feather:edit"></mat-icon>
+                                            <span class="mx-2">Edit Product Details</span>
+                                        </button>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #noProducts>
+                <div *ngIf="!isLoading" class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no products!</div>
+            </ng-template>
+        </div>
+    </div>
+</div>

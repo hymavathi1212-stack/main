@@ -1,0 +1,307 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <!-- Title -->
+        <div>
+            <div class="text-4xl font-extrabold tracking-tight">Payments List</div>
+        </div>
+        <!-- Actions -->
+        <div class="flex-col shrink-0 items-center sm:flex-row mt-6 sm:mt-0 sm:ml-4">
+            <mat-form-field class="w-full sm:w-36"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-select (selectionChange)="filterByCategory($event)" [value]="selectedStatus">
+                        <mat-option [value]="''">All</mat-option>
+                        <mat-option [value]="'completed'">Completed</mat-option>
+                        <mat-option [value]="'pending'">Not Initiated</mat-option>
+                    </mat-select>
+            </mat-form-field>
+            <!-- <mat-form-field
+                    class="w-full sm:w-72 mt-4 xl:mt-3 sm:mt-0 sm:ml-4"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-icon
+                        matPrefix
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                    <input (input)="filterByQuery(query.value)" placeholder="Search by Name/Product Name"
+                        matInput
+                        #query>
+            </mat-form-field> -->
+            <mat-form-field class="w-full sm:w-72 mt-4 xl:mt-3 sm:mt-0 sm:ml-4">
+                <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+                  <input matStartDate formControlName="start" placeholder="Start date">
+                  <input matEndDate (dateChange)="dateRangeChanged()" formControlName="end" placeholder="End date">
+                </mat-date-range-input>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                <mat-hint class="text-blue-600 underline cursor-pointer" align="end" (click)="resetDates()">reset date</mat-hint>
+                <mat-error *ngIf="range.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+                <mat-error *ngIf="range.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+            </mat-form-field>
+            <button
+                class="ml-4"
+                *ngIf="selectedStatus === 'pending'"
+                mat-flat-button
+                (click)="showConfirmAlert()"
+                [color]="'primary'">
+                <mat-icon [svgIcon]="'heroicons_outline:download'"></mat-icon>
+                <span class="ml-2 mr-1">Export</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+        <!-- Transactions list -->
+        <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+            <ng-container>
+                <ng-container *ngIf="productsList.length > 0; else noData">
+                    <div class="grid">
+                        <!-- Header -->
+                        <div
+                            class="grid-flow-col auto-cols-fr z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                            matSort
+                            (matSortChange)="sortData($event)"
+                            matSortDisableClear>
+                            <div
+                                class="hidden lg:block col-name">
+                                Aff.Name
+                            </div>
+                            <div class="hidden lg:block">
+                                Aff.Email
+                            </div>
+                            <div class="hidden lg:block">
+                                Amount
+                            </div>
+                            <div class="hidden lg:block">
+                                Status
+                            </div>
+                            <div class="hidden lg:block">
+                                Payment Ref
+                            </div>
+                            <div class="hidden lg:block">
+                                Payment Date
+                            </div>
+                            <div class="hidden lg:block">
+                                Converted On
+                            </div>
+                            <div class="hidden lg:block mx-auto">
+                                Details
+                            </div>
+                        </div>
+                        <!-- Rows -->
+                        <ng-container *ngIf="productsList?.length > 0">
+                            <ng-container *ngFor="let products of productsList; trackBy: trackByFn">
+                                <div class="grid grid-flow-col auto-cols-fr items-center py-3 px-6 md:px-8 border-b">
+                                    
+                                    <div class="hidden truncate text-sm sm:block text-left">
+                                        <span>{{products?.affiliateName}}</span>
+                                    </div>
+
+                                    <div class="hidden truncate text-sm sm:block text-left">
+                                        <span>{{products?.affiliateEmail}}</span>
+                                    </div>
+
+                                    <div class="sm:block text-sm text-center">
+                                        <span class="font-mono">{{products.finalCommissionAmount | currency:'INR':'symbol':'1.2-4'}}</span>
+                                    </div>
+
+                                    <div class="hidden text-sm sm:block text-center">
+                                        <span class="text-yellow-600" *ngIf="products?.isPaymentProcessed === 0">Not Initiated</span>
+                                        <span class="text-green-600" *ngIf="products?.isPaymentProcessed === 1">Completed</span>
+                                    </div>
+
+                                    <div class="sm:block text-sm text-center">
+                                        {{(products.paymentReference) || '-'}}
+                                    </div>
+
+                                    <div class="sm:block text-sm text-center">
+                                        {{products?.isPaymentProcessed === 1 ? (products.updatedAt | date: 'MMM dd,yy hh:mm a') : '-'}}
+                                    </div>
+
+                                    <div class="sm:block text-sm text-center">
+                                        {{products.conversionDate | date: 'MMM dd,yy hh:mm a'}}
+                                    </div>
+                                    <div class="mx-auto">
+                                        <button
+                                            class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                            mat-stroked-button
+                                            (click)="toggleDetails(products.id)">
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [svgIcon]="selectedProduct?.id === products.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="grid">
+                                    <ng-container *ngIf="selectedProduct?.id === products.id">
+                                        <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: products}"></ng-container>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                    <mat-paginator
+                        class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                        [ngClass]="{'pointer-events-none': isLoading}"
+                        [length]="pagination.length"
+                        [pageIndex]="pagination.page"
+                        [pageSize]="pagination.size"
+                        [pageSizeOptions]="pageSizeOptions"
+                        (page)="handlePageChange($event)"
+                        [showFirstLastButtons]="true"></mat-paginator>
+                </ng-container>
+            </ng-container>
+            <ng-template
+                #rowDetailsTemplate
+                let-product>
+                <div class="shadow-lg overflow-hidden">
+                    <div class="flex border-b">
+                        <div class="grid grid-flow-col auto-cols-fr gap-4 w-full mb-4 px-6 py-4">
+                            <div class="flex flex-col border-r">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:shopping-cart" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Product Details</h6>
+                                </div>
+                                <div class="flex flex-row">
+                                    <div class="flex-col">
+                                        <div class="flex felx-row">
+                                            <div class="flex items-start flex-col mr-3">
+                                                <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Title</h6>
+                                                <div class="leading-6">
+                                                    <span class="text-sm">{{selectedProduct?.productTitle}}</span>
+                                                </div>
+                                                <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Url</h6>
+                                                <div class="leading-6">
+                                                    <span class="text-sm">
+                                                        <a class="underline text-blue-500" [href]="selectedProduct?.productUrl" target="_blank">
+                                                            {{selectedProduct?.productUrl || 'N.A'}}
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start flex-col mt-2 mr-3">
+                                            <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Description</h6>
+                                            <div class="leading-6">
+                                                <span class="text-sm break-words">{{selectedProduct?.productDescription}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex items-center justify-start mb-2">
+                                    <mat-icon svgIcon="feather:user-check" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Conversion Details</h6>
+                                </div>
+                                <div class="flex-row grid grid-cols-3">
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Name</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.name || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Mobile</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.mobile || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Email</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.email || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Affiliate Status</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.affiliateStatus}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Payment Status</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.paymentStatus}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Last updatedAt</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.updatedAt | date: 'dd MMM yyyy, HH:mm'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-start mb-2 mt-3">
+                                    <mat-icon svgIcon="feather:user-check" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Affiliate Details</h6>
+                                </div>
+                                <div class="flex-row grid grid-cols-3">
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Name</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.affiliateName || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Mobile</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.affiliateMobile || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Email</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.affiliateEmail || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Product Price</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(selectedProduct?.productFinalPrice | currency: 'INR') || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Commission (%)</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(selectedProduct?.finalCommissionPercentage) ? (selectedProduct?.finalCommissionPercentage + '%') : 'N.A' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Commission Amt</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(selectedProduct?.finalCommissionAmount | currency: 'INR') || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Payment Ref</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(selectedProduct?.paymentReference) || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3 border-r">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Comments</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{selectedProduct?.comments || 'N.A' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mt-2 mr-3">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Last UpdatedAt</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm break-words">{{(selectedProduct?.acpUpdatedAt | date: 'dd MMM yy hh:mm') || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #noData>
+                <div *ngIf="!isLoading" class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+                    There are no {{selectedStatus}} transactions!
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,370 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <!-- Loader -->
+        <!-- <div
+            class="absolute inset-x-0 bottom-0"
+            *ngIf="isLoading">
+            <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+        </div> -->
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">Users</div>
+        <!-- Actions -->
+        <div class="flex flex-col shrink-0 items-center sm:flex-row mt-6 sm:mt-0 sm:ml-4">
+            <mat-form-field
+                    class="w-full sm:w-36"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-select
+                        [value]="selectedStatus"
+                        (selectionChange)="filterByCategory($event)">
+                        <mat-option [value]="''">All</mat-option>
+                        <mat-option [value]="'0'">Incomplete</mat-option>
+                        <mat-option [value]="'2'">Unverified</mat-option>
+                        <mat-option [value]="'1'">Verified</mat-option>
+                        <mat-option [value]="'3'">Rejected</mat-option>
+                        <mat-option [value]="'4'">Hold</mat-option>
+                    </mat-select>
+            </mat-form-field>
+            <mat-form-field
+                    class="w-full sm:w-72 mt-4 xl:mt-3 sm:mt-0 sm:ml-4"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-icon
+                        matPrefix
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                    <input
+                        (input)="filterByQuery(query.value)"
+                        placeholder="Search by name or email"
+                        matInput
+                        #query>
+            </mat-form-field>
+            <!-- Add button -->
+            <!-- <button
+                class="ml-4"
+                mat-flat-button
+                [color]="'primary'">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1">Add</span>
+            </button> -->
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+
+        <!-- Users list -->
+        <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+            <ng-container>
+                <ng-container *ngIf="usersList.length > 0; else noUsers">
+                    <div class="grid">
+                        <!-- Header -->
+                        <div
+                            class="grid-flow-col auto-cols-fr z-10 sticky top-0 grid gap-4 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                            matSort
+                            (matSortChange)="sortData($event)"
+                            matSortDisableClear>
+                            <div class="hidden lg:block"
+                            [mat-sort-header]="'id'">
+                                Id
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'name'">
+                                Name
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'mobile'">
+                                Mobile
+                            </div>
+                            
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'createdAt'">
+                                Joined On
+                            </div>
+                            <div
+                                class="hidden lg:block">
+                                Profile Status
+                            </div>
+                            <div class="hidden lg:block" [mat-sort-header]="'email'">Email</div>
+
+                            <div class="hidden lg:block mx-auto">
+                                Details
+                            </div>
+                        </div>
+                        <!-- Rows -->
+                        <ng-container *ngIf="usersList?.length > 0">
+                            <ng-container *ngFor="let user of usersList; trackBy: trackByFn">
+                                <div class="grid grid-flow-col auto-cols-fr items-center py-3 px-6 md:px-8 border-b">
+
+                                    <div class="hidden text-sm sm:block truncate">
+                                        #{{user.id}} - <span class="font-semibold font-mono">{{user.affiliateUserName}}</span>
+                                    </div>
+
+                                    <div class="hidden text-sm sm:block">
+                                        {{user.name}}
+                                    </div>
+
+                                    <div class="hidden text-sm font-mono sm:block">
+                                        {{user.mobile || '-'}}
+                                    </div>
+
+                                    <div class="sm:block text-sm">
+                                        {{user.createdAt | date: 'MMM dd,yy hh:mm a'}}
+                                    </div>
+
+                                    <div class="hidden text-sm sm:block text-center">
+                                        <div>
+                                            <span class="text-dark-600 bg-gray-300 px-2 py-1 rounded" *ngIf="!user?.profileVerified || user?.profileVerified === 0">
+                                                In Complete
+                                            </span>
+                                            <span class="text-white bg-green-400 px-2 py-1 rounded" *ngIf="user?.profileVerified === 1">
+                                                Verified
+                                            </span>
+                                            <span class="text-white bg-orange-400 px-2 py-1 rounded" *ngIf="user?.profileVerified === 2">
+                                                Unverified
+                                            </span>
+                                            <span class="text-white bg-red-400 px-2 py-1 rounded" *ngIf="user?.profileVerified === 3">
+                                                Rejected
+                                            </span>
+                                            <span class="text-white bg-blue-400 px-2 py-1 rounded" *ngIf="user?.profileVerified === 4">
+                                                Hold
+                                            </span>
+                                            <span *ngIf="user?.rejectReason" class="mx-2">
+                                                <mat-icon class="icon-size-4" [matTooltip]="user?.rejectReason" svgIcon="heroicons_solid:information-circle"></mat-icon>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="hidden text-xs sm:block truncate">
+                                        {{user.email}}
+                                    </div>
+
+                                    <div class="mx-auto">
+                                        <button
+                                            class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                            mat-stroked-button
+                                            (click)="toggleDetails(user.id)">
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [svgIcon]="selectedUser?.id === user.id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="grid">
+                                    <ng-container *ngIf="selectedUser?.id === user.id">
+                                        <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: user}"></ng-container>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+
+                    <mat-paginator
+                        class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                        [ngClass]="{'pointer-events-none': isLoading}"
+                        [length]="pagination.length"
+                        [pageIndex]="pagination.page"
+                        [pageSize]="pagination.size"
+                        [pageSizeOptions]="[10, 20, 50]"
+                        (page)="handlePageChange($event)"
+                        [showFirstLastButtons]="true"></mat-paginator>
+
+                </ng-container>
+            </ng-container>
+
+            <ng-template
+                #rowDetailsTemplate
+                let-product>
+                <div class="shadow-lg overflow-hidden">
+                    <div class="flex border-b">
+                        <div class="grid grid-flow-col auto-cols-fr gap-4 w-full mb-4 px-6 py-4">
+                            <div class="flex flex-col border-r">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:user-check" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Basic Details</h6>
+                                </div>
+                                <div class="flex items-start flex-col">
+                                    <h6 class="font-semibold text-gray-400 leading-6 text-md">Email</h6>
+                                    <div class="leading-6">
+                                        <span class="text-sm">{{selectedUser?.email}}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start flex-col">
+                                    <h6 class="font-semibold text-gray-400 leading-6 text-md">Qualification</h6>
+                                    <div class="leading-6">
+                                        <span class="text-sm">{{selectedUser?.qualification || 'N.A'}}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start flex-col">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Date of Birth</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm">{{(selectedUser?.dob | date: 'MMM dd,yyyy') || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mr-2">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Gender</h6>
+                                        <div class="leading-6">
+                                            <span *ngIf="selectedUser?.gender" class="text-sm">{{selectedUser?.gender === 'M' ? 'MALE' : (selectedUser?.gender === 'F' ? 'FEMALE' : 'OTHERS')}}</span>
+                                            <span *ngIf="!selectedUser?.gender" class="text-sm">N.A</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col border-r">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:key" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Bank Details</h6>
+                                </div>
+                                <div class="flex items-start flex-col">
+                                    <h6 class="font-semibold text-gray-400 leading-6 text-md">Account Name</h6>
+                                    <div class="leading-6">
+                                        <span class="text-sm">{{selectedUser?.accountName || 'N.A'}}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start flex-col">
+                                    <h6 class="font-semibold text-gray-400 leading-6 text-md">Account Number</h6>
+                                    <div class="leading-6">
+                                        <span class="text-sm">{{selectedUser?.accountNumber || 'N.A'}}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-start flex-col">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">IFSC</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm">{{selectedUser?.ifsc || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start flex-col mr-2">
+                                        <h6 class="font-semibold text-gray-400 leading-6 text-md">Account Type</h6>
+                                        <div class="leading-6">
+                                            <span class="text-sm">{{selectedUser?.accountType || 'N.A'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col border-r">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:shield" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Identity Details</h6>
+                                </div>
+                                <div class="flex items-start flex-col">
+                                    <h6 class="font-semibold text-gray-400 leading-6 text-md">Aadhaar Number</h6>
+                                    <div class="leading-6">
+                                        <span class="text-sm">{{selectedUser?.aadhaarNumber || 'N.A'}}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start flex-col">
+                                    <h6 class="font-semibold text-gray-400 leading-6 text-md">PAN Number</h6>
+                                    <div class="leading-6">
+                                        <span class="text-sm">{{selectedUser?.panNumber || 'N.A'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <div class="flex items-center justify-center mb-2">
+                                    <mat-icon svgIcon="feather:smartphone" class="mr-1 icon-size-4"></mat-icon>
+                                    <h6 class="font-semibold leading-6 uppercase text-base underline text-sky-500">Social Links</h6>
+                                </div>
+                                <div class="flex items-start mb-3 mt-2">
+                                    <mat-icon class="icon-size-5" svgIcon="feather:globe"></mat-icon>
+                                    <div class="leading-4 mx-2">
+                                        <span [ngClass]="selectedUser?.website ? 'text-blue-500 underline' : ''" class="text-sm">
+                                            <a *ngIf="selectedUser?.website" [href]="selectedUser?.website" target="_blank">Click Here</a>
+                                            <span *ngIf="!selectedUser?.website">N.A</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start mb-3">
+                                    <mat-icon class="icon-size-5" svgIcon="feather:facebook"></mat-icon>
+                                    <div class="leading-4 mx-2">
+                                        <span [ngClass]="selectedUser?.fbUrl ? 'text-blue-500 underline' : ''" class="text-sm">
+                                            <a *ngIf="selectedUser?.fbUrl" [href]="selectedUser?.fbUrl" target="_blank">Click Here</a>
+                                            <span *ngIf="!selectedUser?.fbUrl">N.A</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start mb-3">
+                                    <mat-icon class="icon-size-5" svgIcon="feather:instagram"></mat-icon>
+                                    <div class="leading-4 mx-2">
+                                        <span [ngClass]="selectedUser?.instagramUrl ? 'text-blue-500 underline' : ''" class="text-sm">
+                                            <a *ngIf="selectedUser?.instagramUrl" [href]="selectedUser?.instagramUrl" target="_blank">Click Here</a>
+                                            <span *ngIf="!selectedUser?.instagramUrl">N.A</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start mb-3">
+                                    <mat-icon class="icon-size-5" svgIcon="feather:twitter"></mat-icon>
+                                    <div class="leading-4 mx-2">
+                                        <span [ngClass]="selectedUser?.twitterUrl ? 'text-blue-500 underline' : ''" class="text-sm">
+                                            <a *ngIf="selectedUser?.twitterUrl" [href]="selectedUser?.twitterUrl" target="_blank">Click Here</a>
+                                            <span *ngIf="!selectedUser?.twitterUrl">N.A</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-start mb-3">
+                                    <mat-icon class="icon-size-5" svgIcon="feather:youtube"></mat-icon>
+                                    <div class="leading-4 mx-2">
+                                        <span [ngClass]="selectedUser?.youtubeUrl ? 'text-blue-500 underline' : ''" class="text-sm">
+                                            <a *ngIf="selectedUser?.youtubeUrl" [href]="selectedUser?.youtubeUrl" target="_blank">Click Here</a>
+                                            <span *ngIf="!selectedUser?.youtubeUrl">N.A</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-flow-col grid-cols-2 gap-5 w-full mb-4 px-6 py-4 items-center justify-center text-center">
+                        <div>
+                            <p class="mb-2 text-left items-start justify-start">Map Affiliate Type</p>
+                            <div class="flex flex-row items-center justify-start">
+                                <mat-form-field
+                                    class="w-full"
+                                    [subscriptSizing]="'dynamic'">
+                                    <mat-select [(ngModel)]="affiliateTypeId">
+                                        <mat-option disabled="true" [value]="null">Choose Profile Type</mat-option>
+                                        <mat-option [value]="profileType?.id" *ngFor="let profileType of profileTypes">
+                                            {{profileType?.profileType}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <button (click)="manageProfileTypeAction()" [disabled]="selectedUser?.typeId === affiliateTypeId" class="fuse-mat-button-small mx-2" mat-flat-button [color]="'primary'">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="mb-2 text-left items-start justify-start ">Account Action</p>
+                            <div class="flex flex-row items-center justify-start">
+                                <mat-form-field
+                                    class="w-full"
+                                    [subscriptSizing]="'dynamic'">
+                                    <mat-select [(ngModel)]="currentProfileStatus">
+                                        <mat-option disabled="true" [value]="''">Choose Action</mat-option>
+                                        <mat-option [value]="1">Approve</mat-option>
+                                        <mat-option [value]="3">Reject</mat-option>
+                                        <mat-option [value]="4">Hold</mat-option>
+                                        <mat-option [value]="2">Un-Verified</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <button (click)="manageProfileApproval()" [disabled]="((selectedUser?.profileVerified === currentProfileStatus) || reqPending)" class="fuse-mat-button-small mx-2" mat-flat-button [color]="'primary'">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template #noUsers>
+                <div *ngIf="!isLoading" class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no users!</div>
+            </ng-template>
+
+        </div>
+
+    </div>
+
+</div>

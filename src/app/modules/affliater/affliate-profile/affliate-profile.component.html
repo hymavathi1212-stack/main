@@ -1,0 +1,404 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Main -->
+    <div class="flex-auto p-6 sm:p-10">
+
+        <!-- CONTENT GOES HERE -->
+        <div class="">
+            <div class="mb-8">
+                <p class="text-3xl font-bold">Profile</p>
+                <p *ngIf="profile?.profileRedirectionObj?.profileAlertMessage" class="text-md text-red-700">
+                    {{profile?.profileRedirectionObj?.profileAlertMessage}}
+                </p>
+            </div>
+            <form
+                class="p-4 bg-card shadow rounded overflow-hidden"
+                [formGroup]="affiliateProfileForm" (ngSubmit)="saveDetails()">
+                <div class="px-5">
+                    <fuse-alert
+                        class="mt-8"
+                        *ngIf="showAlert"
+                        [appearance]="'outline'"
+                        [showIcon]="false"
+                        [type]="alert.type"
+                        [@shake]="alert.type === 'error'">
+                        <div [innerHTML]="alert.message"></div>
+                    </fuse-alert>
+                </div>
+                <mat-vertical-stepper
+                    [linear]="true"
+                    #verticalStepper>
+                    <mat-step
+                        [formGroupName]="'basicDetails'"
+                        [stepControl]="affiliateProfileForm.get('basicDetails')"
+                        #verticalStepperStep1>
+                        <ng-template matStepLabel>Basic information</ng-template>
+                        <p class="my-6 font-medium">
+                            Fill in your basic information to let us know your preferences
+                        </p>
+                        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-2">
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'name'"
+                                    [placeholder]="'Full Name'"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:user'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('name').hasError('required')">
+                                    Name is required
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('name').hasError('pattern')">
+                                    Invalid Name
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'email'"
+                                    [placeholder]="'Email Address'"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:mail'"></mat-icon>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'mobile'"
+                                    [placeholder]="'Mobile Number'"
+                                    minlength="10"
+                                    maxlength="10"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:phone'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('mobile').hasError('required')">
+                                    Mobile Number is required
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('mobile').hasError('minlength')">
+                                    Invalid Mobile Number
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('mobile').hasError('pattern')">
+                                    Invalid Mobile Number
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [matDatepicker]="birthdayDatepicker"
+                                    [formControlName]="'dob'"
+                                    [min]="minDate"
+                                    [max]="maxDate"
+                                    [placeholder]="'Birthday'"
+                                    required>
+                                
+                                <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="birthdayDatepicker">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #birthdayDatepicker></mat-datepicker>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:cake'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('dob').hasError('required')">
+                                    Birthday Date Required
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto gt-xs:pr-3">
+                                <mat-select
+                                    [formControlName]="'gender'"
+                                    [placeholder]="'Choose Gender'"
+                                    required>
+                                    <mat-option value="F">FEMALE</mat-option>
+                                    <mat-option value="M">MALE</mat-option>
+                                    <mat-option value="O">OTHER</mat-option>
+                                </mat-select>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:users'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('gender').hasError('required')">
+                                    Gender selection required
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto gt-xs:pr-3">
+                                <mat-select
+                                    [formControlName]="'qualification'"
+                                    [placeholder]="'Choose Qualification'"
+                                    required>
+                                    <mat-option value="Doctrate">Doctrate</mat-option>
+                                    <mat-option value="Post Graduation">Post Graduation</mat-option>
+                                    <mat-option value="Graduation">Graduation</mat-option>
+                                    <mat-option value="10+2">10+2 (Inter/Diploma) </mat-option>
+                                    <mat-option value="10">10 (SSC)</mat-option>
+                                </mat-select>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:academic-cap'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['basicDetails']?.get('qualification').hasError('required')">
+                                    Qualification selection required
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex justify-end">
+                            <button
+                                class="px-8"
+                                mat-flat-button
+                                [color]="'primary'"
+                                [disabled]="verticalStepperStep1.stepControl.invalid"
+                                type="button"
+                                matStepperNext>
+                                Next
+                            </button>
+                        </div>
+                    </mat-step>
+
+                    
+
+                    <mat-step
+                        [formGroupName]="'bankDetails'"
+                        [stepControl]="affiliateProfileForm.get('bankDetails')"
+                        #verticalStepperStep2>
+                        <ng-template matStepLabel>Bank Details</ng-template>
+                        <p class="my-6 font-medium">
+                            Account Information for Affiliate Earnings Payment Processing: 
+                            <span class="font-semibold italic">Your earnings will be processed to this account.</span>
+                        </p>
+                        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-2">
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'accountName'"
+                                    [placeholder]="'Account Name'"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:book-open'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('accountName').hasError('required')">
+                                    Account Name required
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('accountName').hasError('pattern')">
+                                    Invalid Account Name
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'accountNumber'"
+                                    [placeholder]="'Account Number'"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:identification'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('accountNumber').hasError('required')">
+                                    Account Number required
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('accountNumber').hasError('pattern')">
+                                    Invalid Account Number
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'ifsc'"
+                                    [placeholder]="'IFSC'"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('ifsc').hasError('required')">
+                                    IFSC Code Required
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('ifsc').hasError('pattern')">
+                                    Invalid IFSC Code
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto gt-xs:pr-3">
+                                <mat-select
+                                    [formControlName]="'accountType'"
+                                    [placeholder]="'Choose Account Type'"
+                                    required>
+                                    <mat-option value="SAVINGS">SAVINGS</mat-option>
+                                    <mat-option value="CURRENT">CURRENT</mat-option>
+                                    <mat-option value="SALARY">SALARY</mat-option>
+                                </mat-select>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:information-circle'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('accountType').hasError('required')">
+                                    AccountType selection Required
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'aadhaarNumber'"
+                                    [placeholder]="'Aadhar Number'"
+                                    minlength="12"
+                                    maxlength="12"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('aadhaarNumber').hasError('required')">
+                                    Aadhar Number is required
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('aadhaarNumber').hasError('pattern')">
+                                    Invalid Aadhar Number
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'panNumber'"
+                                    [placeholder]="'PAN Number'"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('panNumber').hasError('required')">
+                                    PAN Number is required
+                                </mat-error>
+                                <mat-error *ngIf="affiliateProfileForm.controls['bankDetails']?.get('panNumber').hasError('pattern')">
+                                    Invalid PAN Number
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex justify-end">
+                            <button
+                                class="px-8 mr-2"
+                                mat-flat-button
+                                [color]="'accent'"
+                                type="button"
+                                matStepperPrevious>
+                                Back
+                            </button>
+                            <button
+                                class="px-8"
+                                mat-flat-button
+                                [color]="'primary'"
+                                [disabled]="verticalStepperStep2.stepControl.invalid"
+                                type="button"
+                                matStepperNext>
+                                Next
+                            </button>
+                        </div>
+                    </mat-step>
+                    
+                    <mat-step
+                        [formGroupName]="'socialLinks'"
+                        [stepControl]="affiliateProfileForm.get('socialLinks')"
+                        #verticalStepperStepSocialLinks>
+                        <ng-template matStepLabel>Social Links</ng-template>
+                        <p class="my-6 font-medium">
+                            Provide your social presence information: <span class="font-semibold italic">Ensure that at least one field is filled out</span>
+                        </p>
+                        <p *ngIf="showSocialError" class="text-red-600 text-center mb-2">
+                            Please provide at least one mandatory social link
+                        </p>
+                        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-2">
+                            <mat-form-field class="flex-auto gt-xs:pr-3">
+                                <input
+                                    matInput
+                                    [formControlName]="'website'"
+                                    [placeholder]="'Website Url'">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'feather:globe'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['socialLinks']?.get('website').hasError('pattern')">
+                                    Invalid website url
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto gt-xs:pl-3">
+                                <input
+                                    matInput
+                                    [formControlName]="'instagramUrl'"
+                                    [placeholder]="'Instagram Profile Url'">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'feather:instagram'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['socialLinks']?.get('instagramUrl').hasError('pattern')">
+                                    Invalid instagram url
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto gt-xs:pl-3">
+                                <input
+                                    matInput
+                                    [formControlName]="'fbUrl'"
+                                    [placeholder]="'Facebook Url'">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'feather:facebook'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['socialLinks']?.get('fbUrl').hasError('pattern')">
+                                    Invalid facebook url
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto gt-xs:pl-3">
+                                <input
+                                    matInput
+                                    [formControlName]="'twitterUrl'"
+                                    [placeholder]="'Twitter Url'">
+                                <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'feather:twitter'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['socialLinks']?.get('twitterUrl').hasError('pattern')">
+                                    Invalid twitter url
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto gt-xs:pl-3">
+                                <input
+                                    matInput
+                                    [formControlName]="'youtubeUrl'"
+                                    [placeholder]="'YouTube Url'">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'feather:youtube'"></mat-icon>
+                                <mat-error *ngIf="affiliateProfileForm.controls['socialLinks']?.get('youtubeUrl').hasError('pattern')">
+                                    Invalid youtube url
+                                </mat-error>
+                            </mat-form-field>
+                            <div class="flex justify-end mt-3">
+                                <button
+                                    class="px-8 mr-2"
+                                    mat-flat-button
+                                    [color]="'accent'"
+                                    type="button"
+                                    matStepperPrevious>
+                                    Back
+                                </button>
+                                <button
+                                    class="px-8"
+                                    type="submit"
+                                    mat-flat-button
+                                    [disabled]="verticalStepperStepSocialLinks.stepControl.invalid || processingRequest"
+                                    [color]="'primary'">
+                                    Save Details
+                                </button>
+                            </div>
+                        </div>
+                    </mat-step>
+                </mat-vertical-stepper>
+            </form>
+        </div>
+
+    </div>
+
+</div>

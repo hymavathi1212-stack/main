@@ -1,0 +1,238 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <div class="flex-auto p-6 sm:p-10">
+        <div class="">
+            <div class="mb-8 text-3xl font-bold">Create Product</div>
+                <form class="p-4 bg-card shadow rounded overflow-hidden"
+                [formGroup]="createProductForm">
+                <div class="px-5">
+                    <fuse-alert
+                        class="mt-8"
+                        *ngIf="showAlert"
+                        [appearance]="'outline'"
+                        [showIcon]="false"
+                        [type]="alert.type"
+                        [@shake]="alert.type === 'error'">
+                        <div [innerHTML]="alert.message"></div>
+                    </fuse-alert>
+                </div>
+                <mat-vertical-stepper
+                            [linear]="true"
+                            #verticalStepper>
+                    <mat-step [formGroupName]="'productDetails'" [stepControl]="createProductForm.get('productDetails')" #verticalStepperStep1>
+                        <ng-template matStepLabel>Product information</ng-template>
+                        <p class="my-6 font-medium">
+                            Fill Basic Product information
+                        </p>
+                        <div class="grid sm:grid-cols-1 gap-y-0	gap-1 md:grid-cols-1">
+                            <mat-form-field class="flex-auto">
+                                    <input
+                                        matInput
+                                        [formControlName]="'productTitle'"
+                                        [placeholder]="'Product Title'"
+                                        type="text"
+                                        minlength="5"
+                                        maxlength="200"
+                                        required>
+                                    <mat-icon
+                                        class="icon-size-5"
+                                        matPrefix
+                                        [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
+                                    <mat-error *ngIf="createProductForm.controls['productDetails']?.get('productTitle').hasError('required')">
+                                        Please enter Product Title
+                                    </mat-error>
+                                    <mat-error *ngIf="createProductForm.controls['productDetails']?.get('productTitle').hasError('pattern')">
+                                        Invalid Product Title
+                                    </mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field class="flex-auto">
+                                    <textarea
+                                        matInput
+                                        [formControlName]="'productDescription'"
+                                        [placeholder]="'Product Description'"
+                                        [rows]="3"
+                                        minlength="5"
+                                        maxlength="1000"></textarea>
+                                    <mat-icon
+                                        class="icon-size-5"
+                                        matPrefix
+                                        [svgIcon]="'heroicons_solid:menu-alt-2'"></mat-icon>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('productDescription').hasError('required')">
+                                    Product Description is required
+                                </mat-error>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('productDescription').hasError('minlength')">
+                                    Invalid Product Description Details
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-2">
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'image'"
+                                    [placeholder]="'Image Url'"
+                                    minlength="1"
+                                    maxlength="200"
+                                    type="text">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:globe-alt'"></mat-icon>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('image').hasError('required')">
+                                    Image Url is required
+                                </mat-error>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('image').hasError('pattern')">
+                                    Invalid Image Url
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'productUrl'"
+                                    [placeholder]="'Product Url'"
+                                    minlength="1"
+                                    maxlength="200"
+                                    type="text"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:globe-alt'"></mat-icon>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('productUrl').hasError('required')">
+                                    Product Url is required
+                                </mat-error>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('productUrl').hasError('pattern')">
+                                    Invalid Product Url
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-3">
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'price'"
+                                    [placeholder]="'Actual Price'"
+                                    minlength="1"
+                                    maxlength="10"
+                                    type="text"
+                                    required>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:currency-rupee'"></mat-icon>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('price').hasError('required')">
+                                    Actual Price is required
+                                </mat-error>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('price').hasError('minlength')">
+                                    Invalid Product price
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [formControlName]="'offerPrice'"
+                                    [placeholder]="'Offer Price'"
+                                    minlength="1"
+                                    maxlength="10"
+                                    type="text">
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:currency-rupee'"></mat-icon>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('offerPrice').hasError('required')">
+                                    Offer Price is required
+                                </mat-error>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('offerPrice').hasError('pattern')">
+                                    Invalid Offer Price
+                                </mat-error>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('offerPrice').hasError('offerPriceExceeded')">
+                                    Offer price can not be equal or more than actual price
+                                </mat-error>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('offerPrice').hasError('priceValueRequired')">
+                                    Please Enter Actual Price
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field class="flex-auto">
+                                <input
+                                    matInput
+                                    [min]="minDate"
+                                    [matDatepicker]="expiryDatepicker"
+                                    [formControlName]="'expiryDate'"
+                                    [placeholder]="'Expiry date'">
+                                <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="expiryDatepicker">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #expiryDatepicker></mat-datepicker>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:shield-exclamation'"></mat-icon>
+                                <mat-error *ngIf="createProductForm.controls['productDetails']?.get('expiryDate').hasError('required')">
+                                    Expiry Date Required
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex justify-end">
+                            <button
+                                class="px-8"
+                                mat-flat-button
+                                [color]="'primary'"
+                                [disabled]="verticalStepperStep1.stepControl.invalid"
+                                type="button"
+                                matStepperNext>
+                                Next
+                            </button>
+                        </div>
+                    </mat-step>
+
+                    <mat-step [formGroupName]="'commisionSection'" [stepControl]="createProductForm" #verticalStepperStep2>
+                        <ng-template matStepLabel>Commission Details</ng-template>
+                        <p class="my-6 font-medium mb-3">
+                            Commission Details for Affiliate Payment Processing
+                        </p>
+                        <p class="text-amber-600 mb-5 italic">
+                            *Email Notification will be sent to users regarding new product additions and details of their commissions
+                        </p>
+                        <div class="grid sm:grid-cols-1 gap-y-0	gap-4 md:grid-cols-3">
+                            <mat-form-field *ngFor="let item of profileTypes" class="flex-auto">
+                                <input
+                                    matInput
+                                    [(ngModel)]="profileTypeModel[item.id]"
+                                    [ngModelOptions]="{standalone: true}"
+                                    [placeholder]="item?.profileType"
+                                    min="0"
+                                    max="100"
+                                    type="number"
+                                    required>
+                                <span matSuffix>%</span>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:currency-rupee'"></mat-icon>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex justify-end">
+                            <button
+                                class="px-8 mr-2"
+                                mat-flat-button
+                                [color]="'accent'"
+                                type="button"
+                                matStepperPrevious>
+                                Back
+                            </button>
+                            <button
+                                    class="px-8"
+                                    type="submit"
+                                    mat-flat-button
+                                    [disabled]="verticalStepperStep2.stepControl.invalid || processingRequest"
+                                    [color]="'primary'"(click)="saveDetails()">
+                                    Save Product
+                            </button>
+                        </div>
+                    </mat-step>
+                </mat-vertical-stepper>
+            </form>
+        </div>
+    </div>
+</div>
